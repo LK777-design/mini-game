@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quiz Outubro Rosa</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Nunito:wght@500;700&display=swap">
+<style>
+:root{--rl:#FFD6E7;--rp:#FF4F93;--rd:#C2185B;--li:#C9B6FF;--ce:#9DDCFF;--br:#FFF9FC;--tx:#522442;--ok:#1f8a5b;--bg:#FFF9FC;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2a1424}}
+:root[data-theme="dark"]{--bg:#2a1424}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100dvh;background:var(--bg);color:var(--tx);font:500 17px/1.5 Nunito,"Segoe UI",system-ui,sans-serif;overflow-x:hidden}
+h1,h2,.btn,.ltr{font-family:"Baloo 2","Trebuchet MS",system-ui,sans-serif}
+#scene{position:fixed;inset:0;z-index:0;transition:transform 1s ease}
+#scene svg{width:100%;height:100%;display:block}
+#scene.zoom{transform:scale(1.15)}
+.cloud{position:absolute;height:44px;border-radius:44px;background:#fff;opacity:.85;filter:blur(1px);animation:drift linear infinite}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud::before{width:50px;height:50px;left:16px;top:-24px}.cloud::after{width:36px;height:36px;right:18px;top:-16px}
+@keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+#petals{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.p{position:absolute;top:-24px;background:linear-gradient(135deg,#fff,var(--rp));border-radius:80% 0 80% 0;opacity:.85;animation:fall linear infinite}
+@keyframes fall{0%{transform:translate(0,-10vh) rotate(0)}50%{transform:translate(var(--dx),55vh) rotate(180deg)}100%{transform:translate(calc(var(--dx)*-.5),112vh) rotate(380deg)}}
+#app{position:relative;z-index:2;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:20px 14px 28px}
+.scr{width:min(680px,100%);background:rgba(255,249,252,.93);border-radius:30px;padding:24px 22px;box-shadow:0 14px 44px rgba(194,24,91,.22);text-align:center;animation:in .55s cubic-bezier(.2,.8,.2,1)}
+@keyframes in{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+h1{font-size:clamp(2.2rem,9vw,3.6rem);line-height:1;margin:6px 0 8px;color:var(--rd);font-weight:800}
+h2{font-size:1.45rem;line-height:1.25;margin:10px 0 14px;color:var(--tx);text-align:left}
+.sub{font-size:1.2rem;font-weight:700;color:var(--rp);margin:0 0 8px}
+.chip{display:inline-block;background:var(--rl);color:var(--rd);font-weight:700;border-radius:99px;padding:5px 16px;margin:14px 0 0}
+.btn{appearance:none;border:0;cursor:pointer;font-size:1.1rem;font-weight:800;letter-spacing:.02em;color:#fff;background:linear-gradient(180deg,var(--rp),var(--rd));padding:12px 26px;border-radius:99px;box-shadow:0 5px 0 #8e0f40,0 10px 18px rgba(194,24,91,.3);transition:transform .15s,box-shadow .15s;margin:6px}
+.btn:hover{transform:translateY(-2px)}.btn:active{transform:translateY(3px) scale(.96);box-shadow:0 2px 0 #8e0f40}
+.btn.alt{background:#fff;color:var(--rd);box-shadow:0 0 0 2px var(--rp),0 6px 14px rgba(194,24,91,.15)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--rd);outline-offset:3px}
+.g{width:120px;margin:0 auto;animation:float 4s ease-in-out infinite}.g.big{width:min(170px,42vw)}
+@keyframes float{50%{transform:translateY(-6px)}}
+.eye{transform-box:fill-box;transform-origin:center;animation:blink 4.5s infinite}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}97%{transform:scaleY(.1)}}
+.soft{display:none}.g.no .smile{display:none}.g.no .soft{display:inline}
+.g.ok{animation:hop .7s ease 2}@keyframes hop{50%{transform:translateY(-16px) rotate(-4deg)}}
+.g.no{animation:sway 1.6s ease 1}@keyframes sway{30%{transform:rotate(-4deg)}70%{transform:rotate(3deg)}}
+.top{display:flex;align-items:center;gap:12px;text-align:left}
+.top .meta{flex:1}.num{font-weight:800;color:var(--rd)}
+.bar{height:12px;background:var(--rl);border-radius:9px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--rp),var(--li));border-radius:9px;transition:width .7s ease}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 14px;padding:0}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;font:inherit;font-weight:700;color:var(--tx);background:#fff;border:2px solid var(--rl);border-radius:18px;padding:11px 14px;cursor:pointer;transition:transform .18s,box-shadow .18s,border-color .18s}
+.opt:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 8px 16px rgba(255,79,147,.22);border-color:var(--rp)}
+.opt:disabled{cursor:default;color:var(--tx)}
+.ltr{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--rl);color:var(--rd);font-weight:800}
+.opt.sel{border-color:var(--rd);background:#ffeaf3;box-shadow:0 0 0 3px rgba(255,79,147,.3)}
+.opt.sel .ltr{background:var(--rd);color:#fff}
+.opt.ok{border-color:var(--ok);background:#e6f7ee}.opt.ok .ltr{background:var(--ok);color:#fff}
+.opt.bad{border-color:#b86bd6;background:#f4eaff}.opt.bad .ltr{background:#8a4bb0;color:#fff}
+.opt.dim{opacity:.6}
+.fb{text-align:left;background:#fff;border-left:6px solid var(--rp);border-radius:14px;padding:10px 14px;margin:0 0 10px;animation:in .4s}
+.fb.ok{border-color:var(--ok)}.fb b{display:block;color:var(--rd)}
+.acts{display:flex;flex-wrap:wrap;justify-content:center}
+#snd{position:fixed;z-index:5;top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,249,252,.92);font-size:1.3rem;cursor:pointer;box-shadow:0 4px 12px rgba(194,24,91,.25)}
+.ring{position:relative;width:150px;margin:6px auto}.ring svg{width:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:12;stroke-linecap:round}
+.ring .v{stroke:var(--rp);stroke-dasharray:327;stroke-dashoffset:327;transition:stroke-dashoffset 1.6s ease}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font:800 2.1rem "Baloo 2",system-ui;color:var(--rd)}
+.msg{font-weight:700;font-size:1.15rem;margin:6px 0}.sc{display:flex;gap:10px;justify-content:center;margin:10px 0}.sc div{flex:1;max-width:130px;background:#fff;border-radius:18px;padding:8px 4px;font-weight:700;font-size:.92rem;box-shadow:0 4px 12px rgba(194,24,91,.12)}.sc b{display:block;font:800 1.9rem/1.1 "Baloo 2",system-ui}.dots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:8px 0}.dots span{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.9rem;color:#fff}.dots .y{background:var(--ok)}.dots .n{background:#8a4bb0}.fin{font-size:.98rem;margin:12px 0 4px;color:var(--rd)}
+.rv{text-align:left;background:#fff;border-radius:16px;padding:12px 14px;margin:0 0 10px}
+.rv h3{margin:0 0 4px;font-size:1.02rem;color:var(--rd)}.rv p{margin:3px 0;font-size:.97rem}
+.list{max-height:62dvh;overflow-y:auto;padding-right:4px}
+.bu{position:fixed;z-index:6;pointer-events:none;font-size:1.4rem;animation:pop 1.1s ease-out forwards}
+@keyframes pop{from{opacity:1;transform:translate(0,0) scale(.6)}to{opacity:0;transform:translate(var(--x),var(--y)) scale(1.3) rotate(200deg)}}
+#toast{position:fixed;z-index:9;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 24px);transform:translate(-50%,30px);background:var(--rd);color:#fff;padding:10px 18px;border-radius:99px;opacity:0;transition:.3s;pointer-events:none;font-weight:700}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.bar i{transition:none!important}}
+@media (max-width:420px){.opt{padding:10px 8px;gap:8px}.scr{padding:18px 14px}h2{font-size:1.25rem}}
+</style>
+</head>
+<body>
+<div id="scene" aria-hidden="true">
+<svg viewBox="0 0 800 600" preserveAspectRatio="xMidYMax slice">
+<defs>
+<linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9DDCFF"/><stop offset=".55" stop-color="#E4D6FF"/><stop offset="1" stop-color="#FFD6E7"/></linearGradient>
+<linearGradient id="lk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFD6E7"/><stop offset="1" stop-color="#9DDCFF"/></linearGradient>
+<g id="t"><path d="M-10 0 C-8 -60 -22 -90 -40 -130 L-30 -134 C-14 -104 -4 -90 0 -70 C6 -96 20 -118 44 -142 L52 -136 C28 -112 14 -86 12 0Z" fill="#7a4a5e"/>
+<circle cx="-50" cy="-150" r="46" fill="#FFB3D1"/><circle cx="0" cy="-185" r="58" fill="#FFD6E7"/><circle cx="55" cy="-150" r="48" fill="#FF9EC4"/><circle cx="-10" cy="-135" r="40" fill="#fff" opacity=".75"/><circle cx="30" cy="-205" r="30" fill="#fff" opacity=".8"/><circle cx="-60" cy="-190" r="26" fill="#FF8FBD"/></g>
+</defs>
+<rect width="800" height="600" fill="url(#sk)"/>
+<circle cx="610" cy="130" r="44" fill="#fff" opacity=".7"/>
+<path d="M0 400 L120 270 L210 350 L330 220 L470 370 L590 260 L720 360 L800 300 V430 H0Z" fill="#C9B6FF" opacity=".85"/>
+<path d="M0 430 L90 350 L200 410 L340 320 L480 420 L640 340 L800 420 V450 H0Z" fill="#b8a0f2" opacity=".9"/>
+<rect y="420" width="800" height="180" fill="url(#lk)"/>
+<ellipse cx="400" cy="480" rx="220" ry="9" fill="#fff" opacity=".5"/><ellipse cx="300" cy="520" rx="150" ry="7" fill="#fff" opacity=".4"/>
+<path d="M300 440 Q400 390 500 440" fill="none" stroke="#C2185B" stroke-width="9" stroke-linecap="round"/><path d="M300 452 Q400 402 500 452" fill="none" stroke="#FF4F93" stroke-width="4"/>
+<path d="M0 470 Q120 430 230 480 L260 600 H0Z" fill="#cdeccb"/><path d="M800 465 Q690 430 590 485 L560 600 H800Z" fill="#cdeccb"/>
+<use href="#t" transform="translate(110 520) scale(1.5)"/><use href="#t" transform="translate(700 530) scale(1.7)"/><use href="#t" transform="translate(300 480) scale(.6)"/>
+<g fill="#FF4F93"><circle cx="40" cy="570" r="7"/><circle cx="90" cy="585" r="6" fill="#fff"/><circle cx="740" cy="575" r="7" fill="#FFB3D1"/><circle cx="660" cy="585" r="6"/></g>
+</svg>
+<div class="cloud" style="top:9%;width:130px;animation-duration:70s"></div>
+<div class="cloud" style="top:20%;width:90px;animation-duration:95s;animation-delay:-40s"></div>
+<div class="cloud" style="top:5%;width:110px;animation-duration:120s;animation-delay:-80s"></div>
+</div>
+<div id="petals" aria-hidden="true"></div>
+<button id="snd" type="button" aria-pressed="true" aria-label="Som ligado. Tocar para desligar">🔊</button>
+<main id="app" aria-live="polite"></main>
+<div id="toast" role="status"></div>
+<script>
+"use strict";
+var Q=[
+["O Outubro Rosa é uma campanha de conscientização sobre o câncer de mama.",["VERDADE","MITO"],0,"O Outubro Rosa busca ampliar a conscientização sobre o câncer de mama, incentivar o acesso à informação e promover o cuidado com a saúde."],
+["Apenas mulheres podem ter câncer de mama.",["VERDADE","MITO"],1,"Embora seja muito mais comum em mulheres, o câncer de mama também pode ocorrer em homens, ainda que seja raro."],
+["Um nódulo novo na mama ou na axila pode ser sinal de alerta e precisa ser avaliado por um profissional de saúde.",["VERDADE","MITO"],0,"Um nódulo novo pode ter várias causas, muitas delas benignas, mas só a avaliação profissional pode esclarecer."],
+["Se uma alteração nova na mama não doer, não é preciso se preocupar.",["VERDADE","MITO"],1,"A ausência de dor não descarta um problema. Qualquer alteração nova merece avaliação de um profissional de saúde."],
+["A mamografia é o principal exame usado no rastreamento do câncer de mama.",["VERDADE","MITO"],0,"A indicação e a periodicidade dependem da idade, do risco individual e das recomendações de saúde vigentes."],
+["O autoexame das mamas substitui a mamografia e a avaliação médica.",["VERDADE","MITO"],1,"Conhecer as próprias mamas ajuda a perceber mudanças, mas não substitui o rastreamento indicado nem a avaliação profissional."],
+["Ter histórico familiar de câncer de mama pode aumentar o risco de desenvolver a doença.",["VERDADE","MITO"],0,"O histórico familiar pode aumentar o risco, mas muitas pessoas diagnosticadas não têm histórico familiar conhecido."],
+["Existe uma dieta específica que garante evitar o câncer de mama.",["VERDADE","MITO"],1,"Idade e fatores genéticos, entre outros, influenciam o risco, e nenhuma dieta oferece garantia. Ter fatores de risco também não significa que alguém vai desenvolver a doença."],
+["A detecção precoce pode ampliar as possibilidades de tratamento.",["VERDADE","MITO"],0,"Ela pode permitir o diagnóstico em fases iniciais e melhorar os resultados, embora não garanta a cura em todos os casos."],
+["Receitas caseiras podem substituir o tratamento médico do câncer de mama.",["VERDADE","MITO"],1,"Informações confiáveis, acesso aos serviços de saúde e apoio às pessoas afetadas são fundamentais. Receitas caseiras não substituem tratamento."]
+];
+var L="VM",app=document.getElementById("app"),scene=document.getElementById("scene"),snd=document.getElementById("snd");
+var RM=window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches;
+function fresh(){return{v:"start",i:0,a:[null,null,null,null,null,null,null,null,null,null],sel:null,snd:true}}
+var S;try{S=JSON.parse(sessionStorage.getItem("qor"))||fresh()}catch(e){S=fresh()}
+function save(){try{sessionStorage.setItem("qor",JSON.stringify(S))}catch(e){}}
+function hits(){return S.a.filter(function(x,i){return x===Q[i][2]}).length}
+/* ---- som e vibração ---- */
+var ac;
+function tone(n){if(!S.snd)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();var t=ac.currentTime;n.forEach(function(f,k){var o=ac.createOscillator(),g=ac.createGain();o.type="sine";o.frequency.value=f;g.gain.setValueAtTime(.0001,t+k*.12);g.gain.exponentialRampToValueAtTime(.07,t+k*.12+.02);g.gain.exponentialRampToValueAtTime(.0001,t+k*.12+.22);o.connect(g);g.connect(ac.destination);o.start(t+k*.12);o.stop(t+k*.12+.25)})}catch(e){}}
+function vib(p){try{if(S.snd&&navigator.vibrate)navigator.vibrate(p)}catch(e){}}
+function sndUI(){snd.textContent=S.snd?"🔊":"🔇";snd.setAttribute("aria-pressed",S.snd);snd.setAttribute("aria-label",S.snd?"Som ligado. Tocar para desligar":"Som desligado. Tocar para ligar")}
+snd.onclick=function(){S.snd=!S.snd;sndUI();save();tone([660])};
+/* ---- personagem ---- */
+function bow(c,tr){return '<g transform="'+tr+'"><path d="M0 0C-24-18-24 18 0 0Z" fill="'+c+'"/><path d="M0 0C24-18 24 18 0 0Z" fill="'+c+'"/><path d="M0 3L-9 22L-2 17L0 24L2 17L9 22Z" fill="'+c+'"/><circle r="4.5" fill="#C2185B"/></g>'}
+function girl(cls,big){return '<div class="g '+(big?"big ":"")+(cls||"")+'" aria-hidden="true"><svg viewBox="0 0 120 150"><ellipse cx="60" cy="62" rx="40" ry="46" fill="#5a2d4a"/><path d="M28 150Q32 102 60 98Q88 102 92 150Z" fill="#FF4F93"/><path d="M48 100L60 114L72 100Z" fill="#fff"/><rect x="53" y="88" width="14" height="14" fill="#FFE3D0"/><circle cx="60" cy="64" r="30" fill="#FFE3D0"/><path d="M29 62Q36 28 60 30Q86 28 91 62Q72 46 60 48Q46 46 29 62Z" fill="#5a2d4a"/><ellipse class="eye" cx="48" cy="68" rx="3.4" ry="4.8" fill="#3a1830"/><ellipse class="eye" cx="72" cy="68" rx="3.4" ry="4.8" fill="#3a1830"/><circle cx="40" cy="77" r="5" fill="#ffb3cf" opacity=".7"/><circle cx="80" cy="77" r="5" fill="#ffb3cf" opacity=".7"/><path class="smile" d="M52 78Q60 87 68 78" fill="none" stroke="#C2185B" stroke-width="2.4" stroke-linecap="round"/><path class="soft" d="M53 80Q60 83 67 80" fill="none" stroke="#C2185B" stroke-width="2.4" stroke-linecap="round"/>'+bow("#FF4F93","translate(86 36) scale(.55) rotate(18)")+'<circle cx="94" cy="118" r="7" fill="#FFE3D0"/>'+bow("#FF4F93","translate(100 106) scale(.6)")+'</svg></div>'}
+/* ---- pétalas ---- */
+if(!RM){var pc=document.getElementById("petals");for(var k=0;k<22;k++){var d=document.createElement("i"),s=8+Math.random()*12;d.className="p";d.style.cssText="left:"+Math.random()*100+"%;width:"+s+"px;height:"+s+"px;animation-duration:"+(9+Math.random()*10)+"s;animation-delay:-"+Math.random()*16+"s;--dx:"+(Math.random()*160-60)+"px";pc.appendChild(d)}}
+/* ---- telas ---- */
+function esc(t){return t}
+function render(){
+  var h="";
+  if(S.v==="start"){
+    h='<section class="scr">'+girl("",1)+'<h1>QUIZ OUTUBRO ROSA</h1><p class="sub">Conhecimento também é uma forma de cuidado.</p><p>Responda a 10 afirmações de mito ou verdade e descubra quanto você sabe sobre a conscientização do câncer de mama.</p><button class="btn" data-act="start">🌸 COMEÇAR QUIZ</button><br><span class="chip">10 afirmações • 1 missão: aprender</span></section>';
+  }else if(S.v==="quiz"){
+    var i=S.i,q=Q[i],a=S.a[i],done=a!==null,ch=done?a:S.sel,good=done&&a===q[2];
+    h='<section class="scr" aria-labelledby="qt"><div class="top">'+girl(done?(good?"ok":"no"):"")+'<div class="meta"><span class="num">Pergunta '+(i+1)+' de 10</span><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="'+(i+(done?1:0))+'"><i id="pb" style="width:'+(i*10)+'%" data-w="'+((i+(done?1:0))*10)+'"></i></div></div></div><h2 id="qt"><small style="display:block;color:var(--rp);font-size:.95rem">Mito ou verdade?</small>“'+q[0]+'”</h2><div class="opts" role="group" aria-label="Mito ou verdade">';
+    q[1].forEach(function(t,j){
+      var c="opt";if(done){c+=j===q[2]?" ok":(j===a?" bad":" dim")}else if(j===ch)c+=" sel";
+      var m=done?(j===q[2]?" ✓ Resposta correta":(j===a?" – sua escolha":"")):"";
+      h+='<button class="'+c+'" data-opt="'+j+'" '+(done?"disabled":"")+' aria-pressed="'+(!done&&j===ch)+'"><span class="ltr">'+L[j]+'</span><span>'+t+'<small>'+(m?'<br>'+m:"")+'</small></span></button>'});
+    h+='</div>';
+    if(done)h+='<div class="fb '+(good?"ok":"")+'" role="status"><b>'+(good?"Você acertou! 🌸 +10 pontos":"Quase! Vamos aprender juntos 🎀")+'</b>É '+q[1][q[2]]+". "+q[3]+'</div>';
+    h+='<div class="acts">'+(i>0?'<button class="btn alt" data-act="prev">← VOLTAR</button>':"")+(done?'<button class="btn" data-act="next">'+(i<9?"PRÓXIMA PERGUNTA":"VER RESULTADO")+'</button>':'<button class="btn" data-act="ok" '+(S.sel===null?"disabled":"")+'>CONFIRMAR</button>')+'</div></section>';
+  }else if(S.v==="result"){
+    var n=hits(),sc=n*10,m=sc<=30?"Sua jornada de aprendizado está começando! 🌸":sc<=60?"Você já aprendeu bastante. Continue se informando! 🎀":sc<=90?"Muito bem! Você conhece informações importantes sobre o tema. 🌷":"Perfeito! Você acertou todas as perguntas! Continue compartilhando informação confiável. 🌸";
+    h='<section class="scr">'+girl("ok",1)+'<h1>QUIZ CONCLUÍDO!</h1><div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" stroke="#FFD6E7"/><circle id="rv" class="v" cx="60" cy="60" r="52" data-o="'+(327-327*sc/100)+'"/></svg><b>'+sc+'</b></div><div class="sc"><div style="color:var(--ok)"><b>'+n+'</b>acertos ✓</div><div style="color:#8a4bb0"><b>'+(10-n)+'</b>erros ✗</div><div style="color:var(--rd)"><b>'+n.toFixed(1).replace(".",",")+'</b>nota de 10</div></div><div class="dots" role="img" aria-label="Resultado de cada pergunta">'+S.a.map(function(x,i){var o=x===Q[i][2];return '<span class="'+(o?"y":"n")+'" title="Pergunta '+(i+1)+'">'+(o?"✓":"✗")+'</span>'}).join("")+'</div><p class="msg">'+sc+' de 100 pontos</p><p class="msg">'+m+'</p><div class="acts"><button class="btn" data-act="again">JOGAR NOVAMENTE</button><button class="btn alt" data-act="share">COMPARTILHAR RESULTADO</button><button class="btn alt" data-act="review">REVER APRENDIZADOS</button></div><p class="fin">Outubro Rosa: informação, cuidado e conscientização podem fazer a diferença. Compartilhe conhecimento e incentive o cuidado com a saúde. 🎀</p></section>';
+  }else{
+    h='<section class="scr"><h1 style="font-size:2rem">Rever aprendizados</h1><div class="list">';
+    Q.forEach(function(q,i){var a=S.a[i],ok=a===q[2];h+='<div class="rv"><h3>'+(i+1)+'. '+q[0]+'</h3><p><b>Sua resposta:</b> '+(a===null?"não respondida":q[1][a]+(ok?" ✓":" ✗"))+'</p><p><b>Correta:</b> '+q[1][q[2]]+'</p><p>'+q[3]+'</p></div>'});
+    h+='</div><button class="btn" data-act="back">VOLTAR AO RESULTADO</button></section>';
+  }
+  app.innerHTML=h;
+  requestAnimationFrame(function(){requestAnimationFrame(function(){var p=document.getElementById("pb");if(p)p.style.width=p.dataset.w+"%";var r=document.getElementById("rv");if(r)r.style.strokeDashoffset=r.dataset.o})});
+  if(S.v==="result"&&!RM&&hits()>=7)burst(14);
+  window.scrollTo(0,0);
+}
+function burst(n){var b=app.querySelector(".scr").getBoundingClientRect();for(var k=0;k<n&&!RM;k++){var e=document.createElement("span");e.className="bu";e.textContent=["🌸","🎀","✨"][k%3];e.style.left=(b.left+b.width/2)+"px";e.style.top=(b.top+80)+"px";e.style.setProperty("--x",(Math.random()*320-160)+"px");e.style.setProperty("--y",(Math.random()*-220-40)+"px");document.body.appendChild(e);setTimeout(function(x){x.remove()},1200,e)}}
+function toast(t){var e=document.getElementById("toast");e.textContent=t;e.classList.add("on");setTimeout(function(){e.classList.remove("on")},2400)}
+function share(){
+  var t="Fiz "+hits()*10+" pontos ("+hits()+" acertos e "+(10-hits())+" erros) no Quiz Outubro Rosa 🌸 Conhecimento também é uma forma de cuidado. 🎀";
+  if(navigator.share){navigator.share({title:"Quiz Outubro Rosa",text:t}).catch(function(){})}
+  else if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(function(){toast("Resultado copiado! 🌸")},function(){prompt("Copie seu resultado:",t)})}
+  else prompt("Copie seu resultado:",t);
+}
+function pick(j){if(S.v!=="quiz"||S.a[S.i]!==null)return;S.sel=j;save();render();tone([520]);var b=app.querySelector('[data-opt="'+j+'"]');if(b)b.focus()}
+function confirmA(){
+  if(S.sel===null||S.a[S.i]!==null)return;
+  var good=S.sel===Q[S.i][2];S.a[S.i]=S.sel;S.sel=null;save();render();
+  if(good){burst(16);tone([523,659,784]);vib(40)}else{tone([330,294]);vib([20,40,20])}
+  var f=app.querySelector(".fb");if(f&&f.scrollIntoView)f.scrollIntoView({block:"nearest",behavior:RM?"auto":"smooth"});
+}
+app.addEventListener("click",function(e){
+  var o=e.target.closest("[data-opt]");if(o){pick(+o.dataset.opt);return}
+  var b=e.target.closest("[data-act]");if(!b)return;var a=b.dataset.act;
+  if(a==="start"){tone([523,659]);scene.classList.add("zoom");setTimeout(function(){S.v="quiz";S.i=0;save();render();scene.classList.remove("zoom")},RM?0:650)}
+  else if(a==="ok")confirmA();
+  else if(a==="next"){if(S.i<9){S.i++;S.sel=null}else{S.v="result";tone([523,659,784,1047])}save();render()}
+  else if(a==="prev"){S.i--;S.sel=null;save();render()}
+  else if(a==="again"){var s=S.snd;S=fresh();S.snd=s;S.v="quiz";save();render()}
+  else if(a==="share")share();
+  else if(a==="review"){S.v="review";save();render()}
+  else if(a==="back"){S.v="result";save();render()}
+});
+document.addEventListener("keydown",function(e){
+  if(S.v!=="quiz"||e.ctrlKey||e.metaKey||e.altKey)return;
+  var j=L.toLowerCase().indexOf(e.key.toLowerCase());if(e.key.length===1&&j>-1)pick(j)
+});
+sndUI();render();
+</script>
+</body>
+</html>
